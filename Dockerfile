@@ -1,5 +1,5 @@
 FROM python:3.10-alpine
-ADD main.py requirements.txt /app
+ADD main.py requirements.txt /app/
 WORKDIR /app
 
 RUN apk add gcc gfortran build-base wget freetype-dev libpng-dev openblas-dev jpeg-dev zlib-dev libffi-dev
