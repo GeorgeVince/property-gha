@@ -101,10 +101,11 @@ class ScriptTag:
 
 def github():
     token = os.getenv("INPUT_REPO-TOKEN")
+    repo = os.getenv("GITHUB_REPOSITORY")
     g = Github(token)
     
-    for repo in g.get_user().get_repos():
-        print(f"::set-output name=testOutput::{repo.name}")
+    contents = g.get_repo(repo).get_contents("README.md")
+    print(f"::set-output name=testOutput::{contents}")
 
 if __name__ == "__main__":
     github()
