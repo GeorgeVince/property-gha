@@ -6,6 +6,9 @@ inputs:
     description: 'Found by searching on Zoopla'
     required: true
     default: '123456'
+  repo-token:
+    description: 'github token'
+    required: true
 outputs:
   testOutput:
     description: 'test output'
