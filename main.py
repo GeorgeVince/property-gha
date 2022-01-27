@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from matplotlib.pyplot import draw
 import requests
 import json
 import csv
@@ -80,20 +79,24 @@ def verify():
 
     print(f"::set-output name=completed::{file_present and todays_date_present}")
 
-
-def main():
-
+def get_current_price():
     property_uprn = os.getenv("INPUT_UPRN")
     print(f"::set-output name=testOutput::{property_uprn}")
 
     r = requests.get(f"https://www.zoopla.co.uk/property/uprn/{property_uprn}/")
     content = r.text
     tag = _find_final_script_tag(content)
-    current_price = _find_current_price_from_script_tag(tag)
+    return _find_current_price_from_script_tag(tag)
+
+def main():
+
+    current_price = get_current_price()
     update_data(current_price)
     draw_and_export()
     verify()
 
-
 if __name__ == "__main__":
-    main()
+    property_uprn = os.getenv("INPUT_UPRN")
+    print(f"::set-output name=testOutput::{property_uprn}")
+
+    # main()

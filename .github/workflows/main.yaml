@@ -16,4 +16,4 @@ jobs:
           uprn: ${{ secrets.uprn }}
       # Use the output from the `hello` step
       - name: Completed?
-        run: echo "The step was completed? ${{ steps.propertyprice.outputs.completed }}"
+        run: echo "The step was completed? ${{ steps.propertyprice.outputs.testOutput }}"
