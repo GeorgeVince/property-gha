@@ -1,9 +1,10 @@
 from dataclasses import dataclass
+from turtle import update
 from github import Github
 
 # import requests
 # import json
-# import csv
+import csv
 
 # import matplotlib.pylab as plt
 import os
@@ -45,12 +46,12 @@ class ScriptTag:
 #     return current_price
 
 
-# def update_data(price: int):
+def update_data(price: int):
 
-#     with open(DATA_NAME, "a") as csvfile:
-#         fieldnames = ["date", "price"]
-#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-#         writer.writerow({"date": TODAY, "price": price})
+    with open(DATA_NAME, "a") as csvfile:
+        fieldnames = ["date", "price"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writerow({"date": TODAY, "price": price})
 
 
 # def _get_data_file_contents() -> list[dict[str, str]]:
@@ -99,15 +100,21 @@ class ScriptTag:
 #     draw_and_export()
 #     verify()
 
-def github():
+def update_github():
     token = os.getenv("INPUT_REPO-TOKEN")
-    repo = os.getenv("GITHUB_REPOSITORY")
+    repo_name = os.getenv("GITHUB_REPOSITORY")
     g = Github(token)
+    repo = g.get_repo(repo_name)
+
+    update_data(123)
+    with open('data.csv', 'r') as f:
+        contents = f.read()
     
-    contents = g.get_repo(repo).get_contents("README.md")
-    print(f"::set-output name=testOutput::{contents}")
+    repo.create_file("data.csv", TODAY, contents)
+
 
 if __name__ == "__main__":
-    github()
+    update_github()
 
     # main()
+    
