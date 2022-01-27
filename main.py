@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from github import Github
+
 # import requests
 # import json
 # import csv
@@ -97,8 +99,14 @@ class ScriptTag:
 #     draw_and_export()
 #     verify()
 
+def github():
+    token = os.getenv("INPUT_REPO_TOKEN")
+    g = Github(token)
+    
+    for repo in g.get_user().get_repos():
+        print(f"::set-output name=testOutput::{repo.name}")
+
 if __name__ == "__main__":
-    property_uprn = os.getenv("INPUT_UPRN")
-    print(f"::set-output name=testOutput::{True}")
+    github()
 
     # main()
