@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from github import Github
+from github import Github, Repository
 
 import requests
 import json
@@ -75,19 +75,8 @@ def draw_and_export():
     plt.savefig(IMAGE_NAME)
 
 
-def verify():
-    # Checks we have an out.png and data for todays date
-    file_present = os.path.exists(IMAGE_NAME)
-    content = _get_data_file_contents()
-    todays_date_present = any(r["date"] == TODAY for r in content)
-
-    # see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
-    print(f"::set-output name=completed::{file_present and todays_date_present}")
-
-
 def get_current_price():
     property_uprn = os.getenv("INPUT_UPRN")
-
     r = requests.get(f"https://www.zoopla.co.uk/property/uprn/{property_uprn}/")
     content = r.text
     tag = _find_final_script_tag(content)
@@ -95,29 +84,38 @@ def get_current_price():
 
 
 def main():
-
-    current_price = get_current_price()
-    update_data(current_price)
-    draw_and_export()
-    verify()
-
-
-def update_github():
-
     token = os.getenv("INPUT_REPO-TOKEN")
     repo_name = os.getenv("GITHUB_REPOSITORY")
     g = Github(token)
     repo = g.get_repo(repo_name)
 
+    get_github_content(repo)
+    update_data(get_current_price())
+    draw_and_export()
+    update_github(repo)
+
+
+def update_github(repo: Repository):
+    gh_contents = repo.get_contents(DATA_NAME)
     with open(DATA_NAME, "r") as f:
         contents = f.read()
-    repo.create_file(DATA_NAME, TODAY, contents)
+    repo.update_file(DATA_NAME, TODAY, contents, gh_contents.sha)
 
+    gh_contents = repo.get_contents(IMAGE_NAME)
     with open(IMAGE_NAME, "r") as f:
         contents = f.read()
-    repo.create_file(IMAGE_NAME, TODAY, contents)
+    repo.update_file(IMAGE_NAME, TODAY, contents, gh_contents.sha)
+
+
+def get_github_content(repo: Repository):
+    contents = repo.get_contents(DATA_NAME)
+    with open(DATA_NAME, "w") as f:
+        f.write(contents.decoded_content.decode())
 
 
 if __name__ == "__main__":
+
     main()
-    update_github()
+
+    # see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
+    print(f"::set-output name=completed::WOOP! Prices updated")
