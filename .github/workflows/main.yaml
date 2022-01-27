@@ -15,6 +15,6 @@ jobs:
         with:
           uprn: ${{ secrets.uprn }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      # Use the output from the `hello` step
+      # Use the output from the `propertyprice` step
       - name: Completed?
-        run: echo "The step was completed? ${{ steps.propertyprice.outputs.testOutput }}"
+        run: echo "The step was completed? ${{ steps.propertyprice.outputs.completed }}"
