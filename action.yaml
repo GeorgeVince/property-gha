@@ -1,16 +1,16 @@
 # action.yml
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Estimate Property Price'
+description: 'Update your repo with estimated property price!'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  uprn:
+    description: 'Found by searching on Zoopla'
     required: true
-    default: 'World'
+    default: '123456'
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  testOutput:
+    description: 'test output'
+  completed:
+    description: 'if completed correctly!'
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - ${{ inputs.who-to-greet }}

@@ -1,9 +1,15 @@
 from dataclasses import dataclass
+from matplotlib.pyplot import draw
 import requests
 import json
 import csv
 from datetime import datetime
 import matplotlib.pylab as plt
+import os
+
+IMAGE_NAME = "prices.png"
+DATA_NAME = "data.csv"
+TODAY = datetime.today().strftime("%Y-%m-%d")
 
 
 @dataclass
@@ -37,20 +43,23 @@ def _find_current_price_from_script_tag(scriptTag: ScriptTag):
 
 
 def update_data(price: int):
-    today = datetime.today().strftime("%Y-%m-%d")
 
-    with open("data.csv", "a") as csvfile:
+    with open(DATA_NAME, "a") as csvfile:
         fieldnames = ["date", "price"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writerow({"date": today, "price": price})
+        writer.writerow({"date": TODAY, "price": price})
 
 
-def draw_and_export():
-    with open("data.csv") as csvfile:
+def _get_data_file_contents() -> list[dict[str, str]]:
+    with open(DATA_NAME) as csvfile:
         fieldnames = ["date", "price"]
         reader = csv.DictReader(csvfile, fieldnames=fieldnames)
         content = [r for r in reader]
+    return content
 
+
+def draw_and_export():
+    content = _get_data_file_contents()
     x = [r["date"] for r in content]
     y = [int(r["price"]) for r in content]
     plt.figure(figsize=(15, 10))
@@ -60,20 +69,31 @@ def draw_and_export():
     plt.ylabel("estimated price")
     plt.title("Zoopla Property Estimate")
 
-    plt.savefig("out.png")
+    plt.savefig(IMAGE_NAME)
 
 
-def main(property_uprn: str):
-    r = requests.get(
-        f"https://www.zoopla.co.uk/property/uprn/{property_uprn}/",
-        headers={"accept": "application/json"},
-    )
+def verify():
+    # Checks we have an out.png and data for todays date
+    file_present = os.path.exists(IMAGE_NAME)
+    content = _get_data_file_contents()
+    todays_date_present = any(r["date"] == TODAY for r in content)
+
+    print(f"::set-output name=completed::{file_present and todays_date_present}")
+
+
+def main():
+
+    property_uprn = os.getenv("INPUT_UPRN")
+    print(f"::set-output name=testOutput::{property_uprn}")
+
+    r = requests.get(f"https://www.zoopla.co.uk/property/uprn/{property_uprn}/")
     content = r.text
     tag = _find_final_script_tag(content)
     current_price = _find_current_price_from_script_tag(tag)
     update_data(current_price)
+    draw_and_export()
+    verify()
 
 
 if __name__ == "__main__":
     main()
-    
