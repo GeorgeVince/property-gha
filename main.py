@@ -100,7 +100,7 @@ class ScriptTag:
 #     verify()
 
 def github():
-    token = os.getenv("INPUT_REPO_TOKEN")
+    token = os.getenv("INPUT_REPO-TOKEN")
     g = Github(token)
     
     for repo in g.get_user().get_repos():
