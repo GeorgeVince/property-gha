@@ -99,6 +99,6 @@ class ScriptTag:
 
 if __name__ == "__main__":
     property_uprn = os.getenv("INPUT_UPRN")
-    print(f"::set-output name=testOutput::{property_uprn}")
+    print(f"::set-output name=testOutput::{True}")
 
     # main()
