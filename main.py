@@ -102,8 +102,6 @@ def update_github(repo: Repository):
     repo.update_file(DATA_NAME, TODAY, contents, gh_contents.sha)
 
     gh_contents = repo.get_contents(IMAGE_NAME)
-    with open(IMAGE_NAME, "r") as f:
-        contents = f.read()
     repo.update_file(IMAGE_NAME, TODAY, contents, gh_contents.sha)
 
 
