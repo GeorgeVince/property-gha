@@ -1,0 +1,19 @@
+on: [push]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: Simple job to update a repo!
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Update property price
+        uses: ./ # Uses an action in the root directory
+        id: propertyprice
+        with:
+          uprn: ${{ secrets.uprn }}
+      # Use the output from the `hello` step
+      - name: Completed?
+        run: echo "The step was completed? ${{ steps.hello.outputs.completed }}"
